@@ -21,6 +21,9 @@ Configuration: ``./src/settings.js``
 URL  | Method | Authenticated | Description
 --- | --- | --- | ---
 ``/users`` | POST | false | Create new user
+``/users/login`` | POST | false | Login with credentials, returns an api key
+``/users/logout`` | GET | true | Remove API key which was used for authentication
+``/users/logout/all`` | POST | true | Remove all API keys from the authenticated user
 ``/users/me`` | GET | true | Show authenticated profile
 ``/users/me`` | PATCH | true | Update authenticated profile
 ``/users/me`` | DELETE | true | Delete authenticated profile and all linked quotes
