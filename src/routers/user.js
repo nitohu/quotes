@@ -34,5 +34,32 @@ router.get("/users/me", auth, async (req, res) => {
 
     res.send(data)
 })
+// Update profile
+router.patch("/users/me", auth, async (req, res) => {
+    if (!User.isValid(req.body)) {
+        return res.status(400).send({error: "Invalid request."})
+    }
+
+    const fields = Object.keys(req.body)
+    try {
+        fields.forEach((field) => req.user[field] = req.body[field])
+        console.log(req.user)
+        await req.user.save()
+
+        res.send(req.user)
+    } catch (e) {
+        console.info(e.message)
+        res.status(400).send({ error: e._message })
+    }
+})
+// Delete profile
+router.delete("/users/me", auth, async (req, res) => {
+    try {
+        await req.user.delete()
+        res.send(req.user)
+    } catch (e) {
+        res.status(400).send(e._message)
+    }
+})
 
 module.exports = router

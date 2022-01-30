@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const validator = require("validator")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const Quotes = require("./quotes")
 
 const userSchema = mongoose.Schema({
     username: {
@@ -51,6 +52,11 @@ userSchema.pre("save", async function(next) {
 
     next()
 })
+userSchema.pre("remove", async function (next) {
+    const res = await Quotes.deleteMany({ user: this._id })
+    console.log(`Deleted quotes: ${ res.deletedCount }`)
+    next()
+})
 
 userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({ _id: this._id.toString() }, settings.secretToken)
@@ -67,6 +73,12 @@ userSchema.methods.toJSON = function () {
     delete user.password
 
     return user
+}
+
+userSchema.statics.isValid = (obj) => {
+    const allowedFields = ["username", "email", "password"]
+    const fields = Object.keys(obj)
+    return fields.every((field) => allowedFields.includes(field))
 }
 
 const UserModel = mongoose.model("User", userSchema)
