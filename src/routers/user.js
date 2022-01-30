@@ -1,6 +1,7 @@
 const express = require("express")
 const auth = require("../middleware/auth")
 const User = require("../models/user")
+const Quotes = require("../models/quotes")
 
 const router = new express.Router()
 
@@ -27,8 +28,11 @@ router.post("/users/", async (req, res) => {
 })
 // Show profile
 router.get("/users/me", auth, async (req, res) => {
-    res.send(req.user)
-    console.log(req.user)
+    const quotes = await Quotes.find({ user: req.user._id })
+    const data = req.user.toJSON()
+    data.quotes = quotes
+
+    res.send(data)
 })
 
 module.exports = router

@@ -34,10 +34,17 @@ const userSchema = mongoose.Schema({
         token: {
             type: String
         }
-    }]
+    }],
+    quotes: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Quote"
+    }
 })
 
 userSchema.pre("save", async function(next) {
+    this.username = this.username.trim()
+    this.email = this.email.trim()
+
     if (this.isModified("password")) {
         this.password = await bcrypt.hash(this.password, 8)
     }
