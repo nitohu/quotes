@@ -6,7 +6,7 @@ const Quotes = require("../models/quotes")
 const router = new express.Router()
 
 // Create new users
-router.post("/users/", async (req, res) => {
+router.post("/users", async (req, res) => {
     const validFields = ["username", "email", "password"]
     const fields = Object.keys(req.body)
     const isValid = fields.every((field) => validFields.includes(field))

@@ -10,6 +10,15 @@ router.get("/quotes/public", async (req, res) => {
 
     res.send(quotes)
 })
+// Get random public quote
+router.get("/quotes/public/random", async (req, res) => {
+    const quotes = await Quotes.find({ public: true })
+    const index = Math.floor(Math.random() * quotes.length)
+
+    console.log(`Random quote ${index} : ${quotes[index].title}`)
+
+    res.send(quotes[index])
+})
 
 // Get all quotes of user
 router.get("/quotes", auth, async (req, res) => {
