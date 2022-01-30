@@ -11,8 +11,18 @@ router.get("/quotes/public", async (req, res) => {
     res.send(quotes)
 })
 
+// Get all quotes of user
+router.get("/quotes", auth, async (req, res) => {
+    const quotes = await Quotes.find({ user: req.user._id })
+
+    res.send(quotes)
+})
 // Create quotes
 router.post("/quotes", auth, async (req, res) => {
+    if (!Quotes.isValid(req.body)) {
+        return res.status(400).send({error: "Invalid fields."})
+    }
+
     const quote = new Quotes({
         ...req.body,
         user: req.user._id
@@ -25,11 +35,30 @@ router.post("/quotes", auth, async (req, res) => {
         res.status(400).send({error: e.message})
     }
 })
-// Get all quotes of user
-router.get("/quotes", auth, async (req, res) => {
-    const quotes = await Quotes.find({ user: req.user._id })
+// Update quotes
+router.patch("/quotes/:id", auth, async (req, res) => {
+    const quote = await Quotes.findOne({ _id: req.params.id, user: req.user._id })
+    if (!Quotes.isValid(req.body)) {
+        return res.status(400).send({error: "Invalid fields."})
+    }
 
-    res.send(quotes)
+    try {
+        Object.keys(req.body).forEach((field) => quote[field] = req.body[field])
+        await quote.save()
+
+        res.status(200).send(quote)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
+// Delete quotes
+router.delete("/quotes/:id", auth, async (req, res) => {
+    const quote = await Quotes.deleteOne({ _id: req.params.id, user: req.user._id })
+
+    if (!quote) {
+        return res.status(404).send({error: "No quote found."})
+    }
+    res.send(quote)
 })
 
 module.exports = router

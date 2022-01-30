@@ -31,6 +31,13 @@ quoteSchema.methods.toString = function () {
     return this.title + "\n\t- " + this.author
 }
 
+quoteSchema.statics.isValid = function(obj) {
+    const allowedFields = ["title", "author", "public"]
+    const fields = Object.keys(obj)
+
+    return fields.every((field) => allowedFields.includes(field))
+}
+
 const Quote = mongoose.model("Quote", quoteSchema)
 
 module.exports = Quote
