@@ -80,6 +80,17 @@ userSchema.statics.isValid = (obj) => {
     const fields = Object.keys(obj)
     return fields.every((field) => allowedFields.includes(field))
 }
+userSchema.statics.findByCredentials = async (email, password) => {
+    const user = await UserModel.findOne({ email: email })
+    if (!user) {
+        throw new Error("Error while logging in.")
+    }
+    const isMatch = bcrypt.compare(password, user.password)
+    if (!isMatch) {
+        throw new Error("Error while logging in.")
+    }
+    return user
+}
 
 const UserModel = mongoose.model("User", userSchema)
 
