@@ -4,9 +4,28 @@ const Quotes = require("../models/quotes")
 
 const router = new express.Router()
 
+const buildOptions = (request, sortBy = true) => {
+    const sort = {}
+    if (sortBy) {
+        if (request.query.sortBy) {
+            const params = request.query.sortBy.split("_") // 0: field, 1: (desc -> -1| asc -> 1)
+            sort[params[0]] = params[1] === "desc" ? -1 : 1
+        }
+    }
+    const options = {
+        limit: parseInt(request.query.limit),
+        skip: parseInt(request.query.skip),
+        sort
+    }
+    return options
+}
+
 // Get public quotes
+// GET /quotes/public[?limit=<int>][?skip=<int>]
 router.get("/quotes/public", async (req, res) => {
-    const quotes = await Quotes.find({ public: true })
+    const options = buildOptions(req, false)
+
+    const quotes = await Quotes.find({ public: true }, {}, options)
 
     res.send(quotes)
 })
@@ -21,8 +40,11 @@ router.get("/quotes/public/random", async (req, res) => {
 })
 
 // Get all quotes of user
+// GET /quotes[?limit=<int>][?skip=<int>]
+// GET /quotes[?sortBy=<field>_<asc|desc>] (e.g.: /quotes?sortBy=createdAt_asc)
 router.get("/quotes", auth, async (req, res) => {
-    const quotes = await Quotes.find({ user: req.user._id })
+    const options = buildOptions(req)
+    const quotes = await Quotes.find({ user: req.user._id }, {}, options)
 
     res.send(quotes)
 })

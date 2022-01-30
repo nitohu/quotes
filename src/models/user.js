@@ -40,6 +40,8 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Quote"
     }
+}, {
+    timestamps: true
 })
 
 userSchema.pre("save", async function(next) {

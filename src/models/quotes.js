@@ -18,6 +18,8 @@ const quoteSchema = mongoose.Schema({
         required: true,
         ref: "User"
     }
+}, {
+    timestamps: true
 })
 
 quoteSchema.pre("save", function (next) {
